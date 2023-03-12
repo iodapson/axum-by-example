@@ -1,7 +1,7 @@
 <h2>About</h2>
-This is a cook book for Yew. It demonstrates various Yew concepts and actions you will typically perfom using Yew.
+This is a cook book for axum. It demonstrates various axum concepts and actions you will typically perfom using axum.
 
-Each chapter's code demonstration is a mini standalone Yew project that you run locally on your machine.
+Each chapter's code demonstration is a mini standalone axum project that you run locally on your machine.
 
 <h2>Conventions</h2>
 <p style="margin-bottom: 10px;">Pay attention to the comments.</p>
