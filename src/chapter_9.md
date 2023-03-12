@@ -97,13 +97,17 @@ pub struct ReturnedJsonData {
   success_value: u8,
 }
 
-pub async fn send_path_post_handler(Json(sent_file): Json<ExpectedJsonData>) -> Json<ReturnedJsonData> {
-  Json(
-    ReturnedJsonData {
-      recieved_message: sent_file.message,
-      success_value: 1,
-    }
-  )
+pub async fn send_path_post_handler(
+  Json(sent_file): Json<ExpectedJsonData>
+  ) -> Json<ReturnedJsonData> {
+
+    Json(
+        ReturnedJsonData {
+            recieved_message: sent_file.message,
+            success_value: 1,
+        }
+    )
+
 }
 ```
 
@@ -112,13 +116,19 @@ pub async fn send_path_post_handler(Json(sent_file): Json<ExpectedJsonData>) -> 
 ```rust
 use axum::extract::Path; // Path is an axum extractor
 
-/*pub async fn id_path_extractor_get_handler(Path(id): Path<u8>) -> String {
-  format!("Here, the path ':id' received: {}", id)
-}*/ // This is for single paths.
+/*pub async fn id_path_extractor_get_handler(
+    Path(id): Path<u8>
+  ) -> String {
+      format!("Here, the path ':id' received: {}", id)
+}*/ // This is for a single path.
 
 // For extracting multiple paths, use this function signature instead:
-pub async fn id_path_extractor_get_handler( Path(paths): Path<(u8, String)> ) -> String {
-  format!("Here are the paths: first one is u8; {}, second one is String; {}")
+pub async fn id_path_extractor_get_handler(
+  Path(paths): Path<(u8, String)>
+) -> String {
+
+    format!("Here are the paths: first one is u8; {}, second one is String; {}")
+
 }
 ```
 
@@ -126,28 +136,34 @@ pub async fn id_path_extractor_get_handler( Path(paths): Path<(u8, String)> ) ->
 
 ```rust
 use serde::{Serialize, Deserialize};
-// You need to import Query to be able to mange a set of query parameters
+// You need to import Query
+// ...so you can manage a set of query parameters
 use axum::extract::Query;
 use axum::Json;
 
 // Create a struct that would manage a given set of query parameters
-// You need to also derive serde 'Serialize' and 'Deserialize' on the struct
+// You need to also derive serde 'Serialize' and 'Deserialize'
+// ...on the struct
 #[derive(Serialize, Deserialize)]
 pub structFirstQuerySet {
   one: u8,
   two: String,
 }
 
-pub async fn query_params_get_handler( Query(query_set): Query<FirstQuerySet> ) -> Json<FirstQuerySet> {
-  Json (
-    FirstQuerySet {
-      one: query_set.one,
-      two: query_set.two,
-    }
-  )
+pub async fn query_params_get_handler(
+  Query(query_set): Query<FirstQuerySet>
+) -> Json<FirstQuerySet> {
+
+    Json (
+        FirstQuerySet {
+            one: query_set.one,
+            two: query_set.two,
+        }
+    )
   // Alternative, you could simply return
   // Json(query_set)
   // ..which is less verbose, more succinct
+
 }
 ```
 
@@ -157,8 +173,12 @@ pub async fn query_params_get_handler( Query(query_set): Query<FirstQuerySet> ) 
 // * Priority file
 use axum::{TypedHeader, headers::UserAgent};
 
-pub async fn standard_header_user_agent(TypedHeader(user_agent): TypedHeader<UserAgent>) -> String {
-  user_agent.to_string()
+pub async fn standard_header_user_agent(
+  TypedHeader(user_agent): TypedHeader<UserAgent>
+) -> String {
+
+    user_agent.to_string()
+
 }
 ```
 
@@ -166,9 +186,10 @@ pub async fn standard_header_user_agent(TypedHeader(user_agent): TypedHeader<Use
 
 ```rust
 mod send_path_post_handler;
-mod id_path_extractor_get_handler; // The get handler function with path extraction
-mod query_params_get_handler; // The get handler function with query parameters extraction
-mod standard_header_user_agent_get_handler; // * Priority mod
+mod id_path_extractor_get_handler;
+mod query_params_get_handler;
+// The module of focus for this demo
+mod standard_header_user_agent_get_handler;
 
 use axum::{body::Body, Router};
 use axum::{routing::post};
@@ -178,14 +199,23 @@ use query_params_get_handler::query_params_get_handler;
 use standard_header_user_agent_get_handler::standard_header_user_agent;
 
 
-// This function would be assigned to 'app' inside 'run' function inside 'lib.rs'
+// This function would be assigned to 'app' inside function 'run'
+// ...inside 'lib.rs'
 pub fn create_routes() -> Router<Body> {
-  Router::new()
+
+    Router::new()
     .route("/send", post( send_path_post_handler ))
-    // .route("/id_path_extractor/:id", get( id_path_extractor_get_handler )) // for single path
-    .route("/id_path_extractor/:id/id2", get( id_path_extractor_get_handler )) // for multiple paths
+    /*
+    .route("/id_path_extractor/:id",
+      get( id_path_extractor_get_handler )
+    )
+    */ // for  a single path
+    // For multiple paths
+    .route("/id_path_extractor/:id/id2", get( id_path_extractor_get_handler ))
     .route("/enter_queries", get( query_params_get_handler ))
-    .route( "/show_a_standard_header", get(standard_header_user_agent) ) // * priority route
+    // * The route of concern in the chapter's demo
+    .route( "/show_a_standard_header", get(standard_header_user_agent) )
+
 }
 ```
 
@@ -196,12 +226,12 @@ use routes::create_routes;
 
 pub async fn run() {
 
-let app = create_routes();
+    let app = create_routes();
 
-axum::Server::bind(&"0.0.0.0:8070".parse().unwrap())
-  .serve(app.into_make_service())
-  .await
-  .unwrap();
+    axum::Server::bind(&"0.0.0.0:8070".parse().unwrap())
+    .serve(app.into_make_service())
+    .await
+    .unwrap();
 
 }
 ```
