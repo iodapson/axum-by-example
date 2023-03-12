@@ -1,0 +1,375 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Extracting custom headers - Axum by Example</title>
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded affix "><li class="part-title">Basics</li><li class="spacer"></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">2.</strong> Your first route handler method for a get HTTP request</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">3.</strong> Using a 'routes' sub-directory to keep all your route handlers</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">4.</strong> Receiving and returning strings from a HTTP POST request with String payload</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="chapter_5.html"><strong aria-hidden="true">5.</strong> Receiving and returning JSON data in a HTTP POST request with JSON payload</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">Extractors</li><li class="chapter-item expanded "><a href="chapter_6.html"><strong aria-hidden="true">6.</strong> Extracting a single path from a route</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="chapter_7.html"><strong aria-hidden="true">7.</strong> Extracting multiple paths from a route</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="chapter_8.html"><strong aria-hidden="true">8.</strong> Extracting query parameters from a route</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="chapter_9.html"><strong aria-hidden="true">9.</strong> Extracting standard headers (TypedHeaders) from a urls' route</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="chapter_10.html" class="active"><strong aria-hidden="true">10.</strong> Extracting custom headers</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">Cors</li><li class="chapter-item expanded "><a href="chapter_11.html"><strong aria-hidden="true">11.</strong> Cors</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Axum by Example</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h3 id="extracting-custom-headers-from-a-route"><a class="header" href="#extracting-custom-headers-from-a-route">Extracting custom header(s) from a route</a></h3>
+<p>HTTPS method used herein for routing - <code>get</code></p>
+<p><b>Project Setup::</b></p>
+<p>First things first, run command;</p>
+<pre><code>$ cargo new axum_project_name
+</code></pre>
+<p>..which creates a new Rust binary project file.</p>
+<p>Next, run;</p>
+<pre><code>$ cargo add axum
+</code></pre>
+<p>..from anywhere inside your axum project dir to add 'axum' as a crate dependency for your axum project.</p>
+<p>Next up, you need to add tokio with features 'macros' and 'rt-multi-thread';</p>
+<pre><code>$ cargo add tokio -F macros -F rt-multi-thread
+</code></pre>
+<p>..the upper-case &quot;F&quot; argument above means feature.</p>
+<p>N.B: You also need 'serde' with 'derive' feature for this axum demo to parse json data
+To add this to your axum project, run;</p>
+<pre><code>$ cargo add serde -F derive
+</code></pre>
+<p>Axum project folder structure::</p>
+<pre>
+  |-axum_project_name
+   |-dist
+   |-src
+    |-routes
+     |-mod.rs
+     |-send_path_post_handler.rs
+     |-id_path_extractor_get_handler.rs
+     |-query_params_get_handler.rs
+     |-standard_header_user_agent_get_handler.rs
+     |-custom_header_get_handler.rs
+    |-lib.rs
+    |-main.rs
+   |-target
+   |-Cargo.lock
+   |-Cargo.toml
+   |-index.html
+</pre>
+<pre>INSIDE 'Cargo.toml'</pre>
+<code>
+<pre>
+[package]
+name = "yew_project_name"
+version = "0.1.0"
+edition = "2021"
+<p>[dependencies]
+axum = { version = &quot;0.5.17&quot;, features = [&quot;headers&quot;] }
+serde = { version = &quot;1.0.148&quot;, features = [&quot;derive&quot;] }
+tokio = { version = &quot;1.21.2&quot;, feature = [&quot;macros&quot;, &quot;rt-multi-thread&quot;] }
+</pre>
+</code></p>
+<pre  style="color:orange;">INSIDE 'axum_project_name/src/routes/send_path_post_handler.rs'</pre>
+<pre><code class="language-rust">use serde::{Deserialize, Serialize};
+use axum::Json;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ExpectedJsonData {
+  message: String,
+}
+
+#[derive(Serialize)]
+pub struct ReturnedJsonData {
+  received_message: String,
+  success_value: u8,
+}
+
+pub async fn send_path_post_handler(Json(sent_file): Json&lt;ExpectedJsonData&gt;) -&gt; Json&lt;ReturnedJsonData&gt; {
+  Json(
+    ReturnedJsonData {
+      recieved_message: sent_file.message,
+      success_value: 1,
+    }
+  )
+}
+</code></pre>
+<pre style="color:orange;">INSIDE 'axum_project_name/src/routes/id_path_extractor_get_handler.rs'</pre>
+<pre><code class="language-rust">use axum::extract::Path; // Path is an axum extractor
+
+/*pub async fn id_path_extractor_get_handler(Path(id): Path&lt;u8&gt;) -&gt; String {
+  format!(&quot;Here, the path ':id' received: {}&quot;, id)
+}*/ // This is for single paths.
+
+// For extracting multiple paths, use this function signature instead:
+pub async fn id_path_extractor_get_handler( Path(paths): Path&lt;(u8, String)&gt; ) -&gt; String {
+  format!(&quot;Here are the paths: first one is u8; {}, second one is String; {}&quot;)
+}
+</code></pre>
+<pre style="color:orange;">INSIDE 'axum_project_name/src/routes/query_params_get_handler.rs'</pre>
+<pre><code class="language-rust">use serde::{Serialize, Deserialize};
+// You need to import Query to be able to mange a set of query parameters
+use axum::extract::Query;
+use axum::Json;
+
+// Create a struct that would manage a given set of query parameters
+// You need to also derive serde 'Serialize' and 'Deserialize' on the struct
+#[derive(Serialize, Deserialize)]
+pub structFirstQuerySet {
+  one: u8,
+  two: String,
+}
+
+pub async fn query_params_get_handler( Query(query_set): Query&lt;FirstQuerySet&gt; ) -&gt; Json&lt;FirstQuerySet&gt; {
+  Json (
+    FirstQuerySet {
+      one: query_set.one,
+      two: query_set.two,
+    }
+  )
+  // Alternatively, you could simply return
+  // Json(query_set)
+  // ..which is less verbose, more succinct
+}
+</code></pre>
+<pre style="color:orange;">INSIDE 'axum_project_name/src/routes/standard_header_user_agent_get_handler.rs'</pre>
+<pre><code class="language-rust">use axum::{TypedHeader, headers::UserAgent};
+
+pub async fn standard_header_user_agent(TypedHeader(user_agent): TypedHeader&lt;UserAgent&gt;) -&gt; String {
+  user_agent.to_string()
+}
+</code></pre>
+<pre style="color:orange;">INSIDE 'axum_project_name/src/routes/custom_header_get_handler.rs'</pre>
+<pre><code class="language-rust">//* Priority rust file
+use axum::http::HeaderMap;
+
+pub async fn custom_header(headers: HeaderMap) -&gt; String {
+  // * You could get literally any custom-named header, e.g. 'x-code'
+  let x_code_key_value: headers.get(&quot;x-code&quot;).unwrap(); // * Try and use better error handling
+  let x_code_value = x_code_key_value.to_str().unwrap().to_owned();
+  x_code_value
+}
+</code></pre>
+<pre style="color:orange;">INSIDE 'axum_project_name/src/routes/mod.rs'</pre>
+<pre><code class="language-rust">mod send_path_post_handler;
+mod id_path_extractor_get_handler;
+mod query_params_get_handler;
+mod standard_header_user_agent_get_handler;
+mod custom_header_get_handler; // * Priority mod
+
+use axum::{body::Body, Router};
+use axum::{routing::post};
+use send_path_post_handler::send_path_post_handler;
+use id_path_extractor_get_handler::id_path_extractor_get_handler;
+use query_params_get_handler::query_params_get_handler;
+use standard_header_user_agent_get_handler::standard_header_user_agent;
+use custom_header_get_handler::custom_header; // * Priority use
+
+
+// This function would be assigned to 'app' inside 'run' function inside 'lib.rs'
+pub fn create_routes() -&gt; Router&lt;Body&gt; {
+  Router::new()
+    .route(&quot;/send&quot;, post( send_path_post_handler ))
+    // .route(&quot;/id_path_extractor/:id&quot;, get( id_path_extractor_get_handler )) // for single path
+    .route(&quot;/id_path_extractor/:id/id2&quot;, get( id_path_extractor_get_handler )) // for multiple paths
+    .route(&quot;/enter_queries&quot;, get( query_params_get_handler ))
+    .route( &quot;/show_a_standard_header&quot;, get(standard_header_user_agent) )
+    .route(&quot;/show_custom_header&quot;, get( custom_header )) // * Priority route
+}
+</code></pre>
+<pre style="color:orange;">INSIDE 'lib.rs'</pre>
+<pre><code class="language-rust">use routes::create_routes;
+
+pub async fn run() {
+
+let app = create_routes();
+
+axum::Server::bind(&amp;&quot;0.0.0.0:8070&quot;.parse().unwrap())
+  .serve(app.into_make_service())
+  .await
+  .unwrap();
+
+}
+</code></pre>
+<pre style="color:orange;">INSIDE 'main.rs'</pre>
+<pre><code class="language-rust">use axum_project_name::run;
+
+#[tokio::main]
+async fn main() {
+  run().await
+}
+</code></pre>
+<p>To run your app, run command;</p>
+<pre><code>$ cargo watch -x run
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="chapter_9.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a rel="next" href="chapter_11.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="chapter_9.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="chapter_11.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+    </body>
+</html>
